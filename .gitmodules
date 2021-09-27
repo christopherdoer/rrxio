@@ -1,0 +1,12 @@
+[submodule "thirdparty/rpg_trajectory_evaluation"]
+	path = thirdparty/rpg_trajectory_evaluation
+	url = https://github.com/christopherdoer/rpg_trajectory_evaluation.git
+[submodule "thirdparty/kindr"]
+	path = thirdparty/kindr
+	url = https://github.com/ethz-asl/kindr.git
+[submodule "thirdparty/rovio"]
+	path = thirdparty/rovio
+	url = https://github.com/ethz-asl/rovio
+[submodule "thirdparty/reve"]
+	path = thirdparty/reve
+	url = https://github.com/christopherdoer/reve.git

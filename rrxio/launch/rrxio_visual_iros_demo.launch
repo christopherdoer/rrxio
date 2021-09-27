@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--This file is part of RRxIO - Robust Radar Visual/Thermal Odometry
+@author Christopher Doer <christopher.doer@kit.edu>-->
+<launch>
+    <arg name="rosbag_dir"/>
+    <arg name="rosbag"/>
+
+    <!--    number of features to be tracked: 10,15,25-->
+    <arg name="N" default="25"/>
+
+    <arg name="enable_rviz" default="True"/>
+    <arg name="enable_plots" default="True"/>
+    <arg name="shutdown_when_done" default="False"/>
+    <arg name="bag_start" default="0"/>
+    <arg name="bag_dur" default="10000"/>
+    <arg name="max_frame_ctr" default="2000000"/>
+
+    <arg name="config" default="$(find rrxio)/launch/configs/rrxio_iros_datasets_visual.info"/>
+    <arg name="camera_config" default="$(arg rosbag_dir)/rovio_visual.yaml"/>
+    <arg name="timeshift_cam_imu" default="0.002"/>
+    <arg name="topic_cam" default="/sensor_platform/camera_visual/img"/>
+
+    <arg name="radar_calib" default="$(arg rosbag_dir)/radar_calib.yaml"/>
+
+    <arg name="topic_imu" default="/sensor_platform/imu"/>
+    <arg name="topic_radar_trigger" default="/sensor_platform/radar/trigger__"/>
+    <arg name="topic_radar_scan" default="/sensor_platform/radar/scan"/>
+        <node pkg="rrxio" type="rrxio_rosbag_loader_$(arg N)" name="rrxio" output="screen" clear_params="False" launch-prefix="bash -c 'sleep 1; $0 $@' ">
+<!--    <node pkg="rrxio" type="rrxio_rosbag_loader_$(arg N)" name="rrxio" output="screen" clear_params="False" launch-prefix="gdb -ex run &#45;&#45;args">-->
+        <param name="filter_config" value="$(arg config)"/>
+        <param name="camera0_config" value="$(arg camera_config)"/>
+        <param name="rosbag_filename" value="$(arg rosbag_dir)/$(arg rosbag).bag"/>
+        <param name="imu_topic_name" value="$(arg topic_imu)"/>
+        <param name="cam0_topic_name" value="$(arg topic_cam)"/>
+        <param name="cam1_topic_name" value="cam1_not_used"/>
+        <param name="topic_vel" type="str" value="not_used"/>
+        <param name="bag_start" value="$(arg bag_start)"/>
+        <param name="bag_dur" value="$(arg bag_dur)"/>
+        <param name="timeshift_cam_imu" value="$(arg timeshift_cam_imu)"/>
+        <param name="max_frame_ctr" value="$(arg max_frame_ctr)"/>
+
+        <param name="topic_radar_trigger" value="$(arg topic_radar_trigger)"/>
+        <param name="topic_radar_scan" value="$(arg topic_radar_scan)"/>
+
+        <rosparam file="$(find rrxio)/launch/configs/default_params_radar_ego_velocity_estimation.yaml" command="load"/>
+        <rosparam file="$(arg radar_calib)" command="load"/>
+
+        <param name="world_frame" value="odom"/>
+        <param name="imu_frame" value="base_link"/>
+        <param name="camera_frame" value="camera"/>
+    </node>
+
+    <node pkg="rrxio" type="odom_to_path.py" name="odom_to_path_rrxio_visual" output="screen">
+        <param name="topic_odom" type="str" value="/rrxio/rovio/odometry"/>
+        <param name="filter_name" type="str" value="RRxIO Visual"/>
+    </node>
+
+    <node pkg="rrxio" type="plot_states_uncertainty.py" name="plot_states_uncertainty" if="$(arg enable_plots)">
+        <param name="topic_prefix" type="str" value="/rrxio/rovio/"/>
+    </node>
+
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find rrxio)/launch/configs/rrxio.rviz" launch-prefix="bash -c 'sleep 0; $0 $@' "
+          if="$(arg enable_rviz)"/>
+</launch>

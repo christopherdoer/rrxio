@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This file is part of RRxIO - Robust Radar Visual/Thermal Odometry
+@author Christopher Doer <christopher.doer@kit.edu> -->
+<launch>
+    <arg name="id" default=""/>
+
+    <arg name="rosbag_dir"/>
+    <arg name="rosbag"/>
+    <arg name="ground_truth_csv"/>
+    <arg name="ground_truth_type"/>
+
+    <arg name="export_directory"/>
+    <arg name="N"/>
+    <arg name="enable_rviz"/>
+    <arg name="shutdown_when_done"/>
+    <arg name="bag_start"/>
+    <arg name="bag_dur" default="10000"/>
+
+    <arg name="config"/>
+    <arg name="camera_config"/>
+    <arg name="timeshift_cam_imu"/>
+
+    <arg name="radar_calib" default="$(arg rosbag_dir)/radar_calib.yaml"/>
+
+    <arg name="topic_imu" default="/sensor_platform/imu"/>
+    <arg name="topic_cam"/>
+    <arg name="topic_radar_trigger"/>
+    <arg name="topic_radar_scan"/>
+
+    <node pkg="rrxio" type="rrxio_rosbag_loader_$(arg N)" name="rovio$(arg id)" output="screen" clear_params="True" launch-prefix="bash -c 'sleep 2; $0 $@' ">
+        <param name="filter_config" value="$(arg config)"/>
+        <param name="camera0_config" value="$(arg camera_config)"/>
+        <param name="rosbag_filename" value="$(arg rosbag_dir)/$(arg rosbag).bag"/>
+        <param name="imu_topic_name" value="$(arg topic_imu)"/>
+        <param name="cam0_topic_name" value="$(arg topic_cam)"/>
+        <param name="topic_vel" type="str" value="not_used"/>
+        <param name="bag_start" value="$(arg bag_start)"/>
+        <param name="bag_dur" value="$(arg bag_dur)"/>
+        <param name="timeshift_cam_imu" value="$(arg timeshift_cam_imu)"/>
+
+        <param name="topic_radar_trigger" value="$(arg topic_radar_trigger)"/>
+        <param name="topic_radar_scan" value="$(arg topic_radar_scan)"/>
+
+        <rosparam file="$(find rrxio)/launch/configs/default_params_radar_ego_velocity_estimation.yaml" command="load"/>
+        <rosparam file="$(arg radar_calib)" command="load"/>
+
+        <param name="world_frame" value="odom"/>
+        <param name="imu_frame" value="base_link"/>
+        <param name="camera_frame" value="camera"/>
+    </node>
+
+    <node pkg="rrxio" type="evaluate_ground_truth.py" name="evaluate_ground_truth$(arg id)" output="screen" clear_params="true"
+          required="$(arg shutdown_when_done)">
+        <param name="rosbag_name" type="str" value="$(arg rosbag)"/>
+        <param name="rosbag_dir" type="str" value="$(arg rosbag_dir)"/>
+        <param name="ground_truth_type" type="str" value="$(arg ground_truth_type)"/>
+        <param name="ground_truth_csv" type="str" value="$(arg ground_truth_csv)"/>
+        <param name="pose_topic" type="str" value="pose_topic_not_used"/>
+        <param name="odom_topic" type="str" value="/rovio$(arg id)/rovio/odometry"/>
+        <param name="export_directory" type="str" value="$(arg export_directory)"/>
+    </node>
+</launch>

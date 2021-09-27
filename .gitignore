@@ -1,0 +1,32 @@
+# CMake
+CMakeCache.txt
+CMakeFiles
+Makefile
+cmake_install.cmake
+install_manifest.txt
+gtest
+rovio_custom.info
+*.bag
+*.active
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+*~
+*.pyc
+
+html/
+latex/
+.idea/
+CMakeLists.txt.user

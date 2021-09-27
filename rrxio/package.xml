@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>rrxio</name>
+  <version>0.0.0</version>
+  <description>
+
+	rrxio - Robust Radar Visual/Thermal Inertial Odometry
+
+  </description>
+  <url></url>
+  <author>christopher doer</author>
+  <maintainer email="christopher.doer@kit.edu">Christopher Doer</maintainer>
+
+  <license>GPLv3 License</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>catkin_simple</depend>
+  <depend>roscpp</depend>
+  <depend>roslib</depend>
+  <depend>cv_bridge</depend>
+  <depend>message_generation</depend>
+  <depend>message_runtime</depend>
+  <depend>geometry_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>tf</depend>
+  <depend>rosbag</depend>
+  <depend>yaml_cpp_catkin</depend>
+  <depend>image_transport</depend>
+  <depend>rovio</depend>
+  <depend>radar_ego_velocity_estimator</depend>
+  <depend>rpg_trajectory_evaluation</depend>
+
+</package>
