@@ -4,13 +4,12 @@
 <launch>
     <arg name="rosbag_dir"/>
     <arg name="rosbag"/>
-    <arg name="export_file" default=""/>
 
     <!--    number of features to be tracked: 10,15,25-->
     <arg name="N" default="15"/>
 
     <!--  odometry path will be exported to <export_file>_odometry.csv if not empty  -->
-    <arg name="export_file" value=""/>
+    <arg name="export_file" default=""/>
 
     <arg name="enable_rviz" default="True"/>
     <arg name="enable_plots" default="True"/>
