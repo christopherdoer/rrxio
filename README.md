@@ -51,8 +51,12 @@ The following dependencies are included via git submodules (run once upon setup:
 **Build in Release is highly recommended**:
 
 ~~~[shell]
-catkin build rrxio --cmake-args -DCMAKE_BUILD_TYPE=Release
+catkin build rrxio -j2 --cmake-args -DCMAKE_BUILD_TYPE=Release
 ~~~
+
+Depending on the RAM available -j2 or -j1 avoids issues.
+Per default, only the rosbag_nodes are built. 
+To use the online mode, the [rrxio/CMakeLists.txt](https://github.com/christopherdoer/rrxio/blob/master/rrxio/CMakeLists.txt) needs to be changed.
 
 ## Run Demos
 

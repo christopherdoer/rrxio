@@ -65,7 +65,9 @@ class OdomToPath:
             self.last_time_callback = time.time()
 
     def evaluate(self):
+        t = np.vstack([np.array([msg.header.stamp.to_sec()]) for msg in self.path.poses])
         positions = np.vstack([np.array([msg.pose.position.x, msg.pose.position.y, msg.pose.position.z]) for msg in self.path.poses])
+        quaternions = np.vstack([np.array([msg.pose.orientation.x, msg.pose.orientation.y, msg.pose.orientation.z, msg.pose.orientation.w]) for msg in self.path.poses])
 
         step = 2
         trajectory_lengths = np.cumsum(np.linalg.norm(positions[step::step, :] - positions[:-step:step, :], axis=1))
@@ -100,6 +102,9 @@ class OdomToPath:
                 p_err_final_norm / trajectory_lengths[-1] * 100,
                 eul_final_deg[0], eul_final_deg[1], eul_final_deg[2], yaw_err_deg))
             file.close()
+
+            np.savetxt(export_file + "_odometry.csv", np.hstack((t, positions, quaternions)), delimiter=' ', fmt='%.3f')
+
 
     def print_(self, s):
         rospy.loginfo("[odom_to_path_%s] : %s" % (self.filter_name, s))

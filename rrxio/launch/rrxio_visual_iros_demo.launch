@@ -6,13 +6,16 @@
     <arg name="rosbag"/>
 
     <!--    number of features to be tracked: 10,15,25-->
-    <arg name="N" default="25"/>
+    <arg name="N" default="15"/>
+
+    <!--  odometry path will be exported to <export_file>_odometry.csv if not empty  -->
+    <arg name="export_file" default=""/>
 
     <arg name="enable_rviz" default="True"/>
     <arg name="enable_plots" default="True"/>
     <arg name="shutdown_when_done" default="False"/>
     <arg name="bag_start" default="0"/>
-    <arg name="bag_dur" default="10000"/>
+    <arg name="bag_duration" default="10000"/>
     <arg name="max_frame_ctr" default="2000000"/>
 
     <arg name="config" default="$(find rrxio)/launch/configs/rrxio_iros_datasets_visual.info"/>
@@ -25,8 +28,8 @@
     <arg name="topic_imu" default="/sensor_platform/imu"/>
     <arg name="topic_radar_trigger" default="/sensor_platform/radar/trigger__"/>
     <arg name="topic_radar_scan" default="/sensor_platform/radar/scan"/>
-        <node pkg="rrxio" type="rrxio_rosbag_loader_$(arg N)" name="rrxio" output="screen" clear_params="False" launch-prefix="bash -c 'sleep 1; $0 $@' ">
-<!--    <node pkg="rrxio" type="rrxio_rosbag_loader_$(arg N)" name="rrxio" output="screen" clear_params="False" launch-prefix="gdb -ex run &#45;&#45;args">-->
+    <node pkg="rrxio" type="rrxio_rosbag_loader_$(arg N)" name="rrxio" output="screen" clear_params="False" launch-prefix="bash -c 'sleep 1; $0 $@' ">
+        <!--    <node pkg="rrxio" type="rrxio_rosbag_loader_$(arg N)" name="rrxio" output="screen" clear_params="False" launch-prefix="gdb -ex run &#45;&#45;args">-->
         <param name="filter_config" value="$(arg config)"/>
         <param name="camera0_config" value="$(arg camera_config)"/>
         <param name="rosbag_filename" value="$(arg rosbag_dir)/$(arg rosbag).bag"/>
@@ -35,7 +38,7 @@
         <param name="cam1_topic_name" value="cam1_not_used"/>
         <param name="topic_vel" type="str" value="not_used"/>
         <param name="bag_start" value="$(arg bag_start)"/>
-        <param name="bag_dur" value="$(arg bag_dur)"/>
+        <param name="bag_duration" value="$(arg bag_duration)"/>
         <param name="timeshift_cam_imu" value="$(arg timeshift_cam_imu)"/>
         <param name="max_frame_ctr" value="$(arg max_frame_ctr)"/>
 
@@ -50,9 +53,10 @@
         <param name="camera_frame" value="camera"/>
     </node>
 
-    <node pkg="rrxio" type="odom_to_path.py" name="odom_to_path_rrxio_visual" output="screen">
+    <node pkg="rrxio" type="odom_to_path.py" name="odom_to_path_rrxio_visual" output="screen" required="$(arg shutdown_when_done)">
         <param name="topic_odom" type="str" value="/rrxio/rovio/odometry"/>
         <param name="filter_name" type="str" value="RRxIO Visual"/>
+        <param name="export_file" type="str" value="$(arg export_file)"/>
     </node>
 
     <node pkg="rrxio" type="plot_states_uncertainty.py" name="plot_states_uncertainty" if="$(arg enable_plots)">

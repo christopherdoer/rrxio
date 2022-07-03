@@ -30,6 +30,7 @@
 #include <ros/package.h>
 #include <rosbag/bag.h>
 #include <rosbag/view.h>
+#include <sensor_msgs/CompressedImage.h>
 #include <memory>
 #include <iostream>
 #include <locale>
@@ -165,6 +166,9 @@ int main(int argc, char** argv)
   double bag_start = 0.0;
   nh_private.param("bag_start", bag_start, bag_start);
 
+  double bag_duration = -1.;
+  nh_private.param("bag_duration", bag_duration, bag_duration);
+
   double sigma_v_b_x = 0.0;
   nh_private.param("sigma_v_b_x", sigma_v_b_x, sigma_v_b_x);
 
@@ -218,6 +222,9 @@ int main(int argc, char** argv)
     if ((it->getTime() - start).toSec() < bag_start)
       continue;
 
+    if (bag_duration > 0 && (it->getTime() - start).toSec() - bag_start - bag_duration > 0)
+      break;
+
     if (it->getTopic() == imu_topic_name)
     {
       sensor_msgs::Imu::ConstPtr imuMsg = it->instantiate<sensor_msgs::Imu>();
@@ -232,6 +239,21 @@ int main(int argc, char** argv)
         imgMsg->header.stamp = ros::Time().fromSec(imgMsg->header.stamp.toSec() + timeshift_cam_imu);
         rovioNode.imgCallback0(imgMsg);
         ++frame_ctr;
+      }
+      else
+      {
+        sensor_msgs::CompressedImageConstPtr compImgMsg = it->instantiate<sensor_msgs::CompressedImage>();
+        if (compImgMsg != NULL)
+        {
+          cv_bridge::CvImageConstPtr ptr;
+          cv::Mat cv_img = cv_bridge::toCvCopy(compImgMsg)->image;
+          cv::resize(cv_img, cv_img, cv::Size(), 0.5, 0.5);
+          sensor_msgs::ImagePtr imgMsg = cv_bridge::CvImage(compImgMsg->header, "mono8", cv_img).toImageMsg();
+          imgMsg->header.stamp         = ros::Time().fromSec(imgMsg->header.stamp.toSec() + timeshift_cam_imu);
+          imgMsg->header.frame_id      = compImgMsg->header.frame_id;
+          rovioNode.imgCallback0(imgMsg);
+          ++frame_ctr;
+        }
       }
     }
     else if (it->getTopic() == topic_vel)
