@@ -30,9 +30,12 @@ If you use RRxIO for your academic research, please cite our related [paper](htt
 
 ## Getting Started
 
+RRxIO supports: 
+  - Ubuntu 16.04 / ROS Kinetic
+  - Ubuntu 18.04 / ROS Melodic
+
 RRxIO depends on:
 
-- Ubuntu 16.04 and ROS Kinetic
 - [catkin_simple](https://github.com/catkin/catkin_simple.git)
 - [catkin_tools](https://catkin-tools.readthedocs.io/en/latest/)
 - [yaml_cpp_catkin](https://github.com/ethz-asl/yaml_cpp_catkin.git)
